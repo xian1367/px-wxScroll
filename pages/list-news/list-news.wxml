@@ -1,0 +1,16 @@
+<view class='channel'>
+  <view wx:for="{{channel}}" wx:key="*this" bindtap='bindTap' data-index='{{index}}'>{{item}}</view>
+</view>
+<swiper bindchange='bindChange' current="{{current}}">
+  <block wx:for="{{channel}}" wx:key="*this">
+    <swiper-item>
+      <scroll class="scrolls{{index}}" bind:pullDown="_pullDown" bind:pullUp="_pullUp">
+        <block wx:for="{{arr[index]}}" wx:key="" wx:for-index="idx" wx:for-item="itemName">
+          <view class="container">
+          {{itemName}}
+          </view>
+        </block>
+      </scroll>
+    </swiper-item>
+  </block>
+</swiper>

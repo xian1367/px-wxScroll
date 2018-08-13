@@ -17,7 +17,7 @@ Component({
     },
     scrollBar: {
       type: Boolean,
-      value: true,//circle
+      value: true,
     }
   },
   /**
@@ -40,27 +40,22 @@ Component({
   },
   ready: function(){
     var self = this;
-    var query = wx.createSelectorQuery().in(this)
+    var query = wx.createSelectorQuery().in(this);
     query.select('.px-scroll-wrapper').boundingClientRect(function (res) {
       self.setData({
         pxScrollWrapper: res.height
       });
     }).exec();
-    this.calculationHeight();
+    query.select('.px-scroll').boundingClientRect(function (res) {
+      self.setData({
+        pxScroll: res.height
+      });
+    }).exec();
   },
   /**
    * 组件的方法列表
    */
   methods: {
-    calculationHeight: function () {
-      var self = this;
-      var query = wx.createSelectorQuery().in(this)
-      query.select('.px-scroll').boundingClientRect(function (res) {
-        self.setData({
-          pxScroll: res.height
-        });
-      }).exec();
-    },
     touchMove: function (e) {
       var deltaY = this.data.deltaY;
       var vertex = this.data.vertex;
@@ -182,39 +177,79 @@ Component({
       this.triggerEvent("pullUp", {});
     },
     pullDownEnd: function (e) {
-      this.setData({
-        deltaY: 0,
-        scrollType: 0,
-        scrollbarY: 0
-      });
-      this.calculationHeight();
+      var self = this;
+      var query = wx.createSelectorQuery().in(self)
+      query.select('.px-scroll').boundingClientRect(function (res) {
+        self.setData({
+          deltaY: 0,
+          scrollType: 0,
+          scrollbarY: 0,
+          pxScroll: res.height
+        });
+      }).exec();
     },
     pullUpEnd: function (e) {
-      var pxScrollWrapper = this.data.pxScrollWrapper;
-      var tableHeight = this.data.pxScroll - pxScrollWrapper;
-      this.setData({
-        deltaY: -tableHeight,
-        scrollType: 0,
-        scrollbarY: pxScrollWrapper - this.data.scrollbarHeight
-      }, () => {
-        this.calculationHeight();
-      });
+      var self = this;
+      var pxScrollWrapper = self.data.pxScrollWrapper;
+      var tableHeight = self.data.pxScroll - pxScrollWrapper;
+      var query = wx.createSelectorQuery().in(self);
+      query.select('.px-scroll').boundingClientRect(function (res) {
+        self.setData({
+          deltaY: -tableHeight,
+          scrollType: 0,
+          scrollbarY: pxScrollWrapper - self.data.scrollbarHeight,
+          pxScroll: res.height - self.properties.height
+        });
+      }).exec();
     },
     noMore: function(){
-      var pxScrollWrapper = this.data.pxScrollWrapper;
-      var tableHeight = this.data.pxScroll - pxScrollWrapper;
-      var height = this.properties.height;
-      this.setData({
-        deltaY: -tableHeight - height,
-        scrollType: 0,
-        noMore: true,
-        scrollbarY: pxScrollWrapper - this.data.scrollbarHeight - height
-      }, () => {
-        this.calculationHeight();
-      });
+      var self = this;
+      var pxScrollWrapper = self.data.pxScrollWrapper;
+      var tableHeight = self.data.pxScroll - pxScrollWrapper;
+      var height = self.properties.height;
+      var query = wx.createSelectorQuery().in(self);
+      query.select('.px-scroll').boundingClientRect(function (res) {
+        self.setData({
+          deltaY: -tableHeight - height,
+          scrollType: 0,
+          noMore: true,
+          scrollbarY: pxScrollWrapper - self.data.scrollbarHeight - height,
+          pxScroll: res.height
+        });
+      }).exec();
     },
     scrollRestart: function(){
-
+      var self = this;
+      var pxScrollWrapper = self.data.pxScrollWrapper;
+      var deltaY = self.data.deltaY;
+      var query = wx.createSelectorQuery().in(self);
+      var noMore = self.data.noMore;
+      var height = self.properties.height;
+      query.select('.px-scroll').boundingClientRect(function (res) {
+        var tableHeight = -(res.height - pxScrollWrapper);
+        if (noMore) tableHeight = tableHeight + height;
+        self.setData({
+          deltaY: deltaY <= tableHeight ? tableHeight : deltaY,
+          scrollType: 0,
+          noMore: false,
+          scrollbarY: deltaY <= tableHeight ? (pxScrollWrapper - self.data.scrollbarHeight) : self.data.scrollbarY,
+          pxScroll: noMore ? (res.height - height) : res.height
+        });
+      }).exec();
+    },
+    ScrollTo: function(y){
+      var pxScroll = this.data.pxScroll;
+      var pxScrollWrapper = this.data.pxScrollWrapper;
+      var tableHeight = pxScroll - pxScrollWrapper;
+      var scrollbarY = parseInt(pxScrollWrapper * (Math.abs(y) / pxScroll));
+      if (y > 0 || y < -tableHeight){
+        y = -tableHeight;
+        scrollbarY = pxScrollWrapper - this.data.scrollbarHeight
+      }
+      this.setData({
+        deltaY: y,
+        scrollbarY: scrollbarY
+      });
     }
   }
 })

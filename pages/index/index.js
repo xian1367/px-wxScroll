@@ -11,7 +11,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    //获得citys组件
+    //获得scrolls组件
     this.scrolls = this.selectComponent("#scrolls")
   },
   _pullUp:function(){
@@ -35,5 +35,10 @@ Page({
       });
       self.scrolls.pullDownEnd();
     }, 1500)
+  },
+  linkNews: function () {
+    wx.navigateTo({
+      url: '../list-news/list-news',
+    })
   }
 })
