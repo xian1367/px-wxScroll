@@ -89,7 +89,8 @@ Component({
           deltaY: move < vertex ? vertex : move,
           pageY: pageY,
           scrollType: scrollType,
-          scrollbarY: scrollbarY
+          scrollbarY: scrollbarY,
+          scrollbarShow: deltaY == move ? false : true
         })
       }else{
         if (move < height && move > 0){
@@ -107,7 +108,8 @@ Component({
           deltaY: move > vertex ? vertex : move,
           pageY: pageY,
           scrollType: scrollType,
-          scrollbarY: scrollbarY
+          scrollbarY: scrollbarY,
+          scrollbarShow: deltaY == move ? false : true
         })
       }
     },
@@ -116,8 +118,7 @@ Component({
       this.setData({
         pageStart: e.changedTouches[0].pageY,
         pageY: e.changedTouches[0].pageY,
-        scrollbarHeight: parseInt(height),
-        scrollbarShow: true
+        scrollbarHeight: parseInt(height)
       })
     },
     touchChend: function (e) {
