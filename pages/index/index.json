@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "scroll": "/scroll/index"
+  },
+  "disableScroll": true
+}

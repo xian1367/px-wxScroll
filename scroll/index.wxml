@@ -1,0 +1,30 @@
+<view class="px-scroll-wrapper">
+  <view class="px-pull-top-pocket {{scrollType >= 1 && scrollType <= 3 ? 'px-visibility' : ''}}">
+    <view class="px-pull">
+      <view class="px-pull-loading px-icon {{scrollType == 3 ? '' : 'px-icon-pulldown'}}" style=" transform: rotate({{scrollType == 3 || scrollType == 2 ? 180 : 0}}deg);">
+        <view wx:if="{{scrollType == 3}}" class='loading black inline'><view class="{{animation}}"><view></view><view></view><view></view><view></view><view></view><view></view><view></view><view></view><view></view><view></view><view></view><view></view></view></view>
+      </view>
+      <view class="px-pull-caption">{{scrollType == 1 ? '下拉可以刷新' : scrollType == 2 ? '释放立即刷新' : scrollType == 3 ? '正在刷新...' : ''}}</view>
+    </view>
+  </view>
+	<view class="px-scroll" bindtouchmove='touchMove' bindtouchstart='touchStart' bindtouchend='touchChend' style='transform: translate3d(0px, {{deltaY}}px, 0px) translateZ(0px);'>
+    <view class='px-table-view'>
+      <slot></slot>
+    </view>
+		<view wx:if="{{scrollType >= 4 || noMore}}" class="px-pull-bottom-pocket px-block">
+      <view class="px-pull">
+        <view wx:if="{{scrollType == 6}}" class="px-pull-loading px-icon">
+          <view class='loading black inline'><view class="{{animation}}"><view></view><view></view><view></view><view></view><view></view><view></view><view></view><view></view><view></view><view></view><view></view><view></view></view></view>
+        </view>
+        <view class="px-pull-caption px-pull-caption-down">{{scrollType == 4 || scrollType == 5 ? '上拉显示更多' : scrollType == 6 ? '正在加载...' :  noMore ? '没有更多数据了' : ''}}</view>
+      </view>
+    </view>
+  </view>
+	<view wx:if="{{scrollBar}}" class="px-scrollbar px-scrollbar-vertical" style="opacity: {{scrollbarShow ? 1 : 0}};">
+    <view class="px-scrollbar-indicator" style="height: {{scrollbarHeight}}px; transform: translate3d(0px, {{scrollbarY}}px, 0px) translateZ(0px);">
+    </view>
+  </view>
+</view>
+<scroll-view scroll-y style='height:100vw'>
+
+</scroll-view>

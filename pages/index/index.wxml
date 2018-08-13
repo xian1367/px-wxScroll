@@ -1,0 +1,6 @@
+<!--index.wxml-->
+<scroll scrollBar="true" deceleration="0.5" height="50" animation="spinner" id="scrolls" bind:pullDown="_pullDown" bind:pullUp="_pullUp">
+  <view class="container" wx:for="{{arr}}" wx:key="">
+    {{item}}
+  </view>
+</scroll>
