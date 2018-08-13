@@ -2,18 +2,18 @@
 1.微信小程序上拉加载下拉刷新组件<br>
 2.官方自定义组件文档:https://developers.weixin.qq.com/miniprogram/dev/framework/custom-component/<br>
 3.以pages/index为例,引入scroll，在json配置:<br>
-  {
-    "usingComponents": {
-      "scroll": "/scroll/index"
-    },
-    "disableScroll": true
-  }
+  {<br>
+    "usingComponents": {<br>
+      "scroll": "/scroll/index"<br>
+    },<br>
+    "disableScroll": true<br>
+  }<br>
 在js<br>
-  onLoad: function (options) {
-      //获得scrolls组件
-      this.scrolls = this.selectComponent("#scrolls")
-  }
-//disableScroll固定滚动区域
+  onLoad: function (options) {<br>
+      //获得scrolls组件<br>
+      this.scrolls = this.selectComponent("#scrolls")<br>
+  }<br>
+//disableScroll固定滚动区域<br>
 4.      配置:             默认          注释<br>
   (1)   deceleration      0.5          //滚动系数，越小滚动越快<br>
   (2)   height            50           //触发上拉下拉加载刷新的拖动距离，单位(px)<br>
