@@ -5,7 +5,7 @@ Component({
   properties: {
     deceleration: {
       type: Number,
-      value: 1,
+      value: 0.003,
     },
     height: {
       type: Number,
@@ -30,12 +30,13 @@ Component({
     pxScroll: 0,
     pxScrollWrapper: 0,
     vertex: 200,
+    startTime: 0,
     scrollbarHeight: 0,
     scrollbarY: 0,
     scrollbarShow: false,
-    scrollType: 0,
     noMore: false,
-    canOnePointMove: false
+    canOnePointMove: false,
+    scrollType: 0
     //0滑动,1下拉准备,2下拉完成,3下拉执行
     //4上拉准备,5上拉完成,6上拉执行,7上拉加载无更多数据
   },
@@ -57,23 +58,33 @@ Component({
    * 组件的方法列表
    */
   methods: {
+    touchStart: function (e) {
+      if (e.changedTouches.length < 2) {
+        var height = this.data.pxScrollWrapper / this.data.pxScroll * this.data.pxScrollWrapper;
+        var pageY = e.changedTouches[0].pageY;
+        this.setData({
+          startTime: new Date().getTime(),
+          canOnePointMove: true,
+          pageStart: pageY,
+          pageY: pageY,
+          scrollbarShow: true,
+          scrollbarHeight: parseInt(height)
+        })
+      }
+    },
     touchMove: function (e) {
       if (e.changedTouches.length < 2 && this.data.canOnePointMove){
         var deltaY = this.data.deltaY;
         var vertex = this.data.vertex;
         var height = this.properties.height;
         var pageY = e.changedTouches[0].pageY;
-        var move = pageY - this.data.pageStart;
+        var move = pageY - this.data.pageY;
         var pxScroll = this.data.pxScroll;
         var pxScrollWrapper = this.data.pxScrollWrapper;
         var tableHeight = pxScroll - this.data.pxScrollWrapper;
         var scrollType = this.data.scrollType;
         var noMore = this.data.noMore;
-        if (deltaY < 0 && deltaY > -tableHeight) {
-          move = move / this.properties.deceleration;
-        } else {
-          move = move * this.properties.deceleration / 10;
-        }
+        var pageStart = this.data.pageStart;
         move = parseInt(deltaY + move);
         var scrollbarY = parseInt(pxScrollWrapper * (Math.abs(move) / pxScroll));
         if (move < -tableHeight) {
@@ -82,17 +93,12 @@ Component({
           } else if (move < (-tableHeight - height) && !noMore) {
             scrollType = 5;//上拉完成
           }
-          vertex = -tableHeight - height;
-          if (pageY - this.data.pageY > 0 && move < -tableHeight) {
-            vertex = (vertex + Math.abs(pageY - this.data.pageY));
-            pageY = this.data.pageY;
-          }
+          vertex = -tableHeight - vertex;
           this.setData({
             deltaY: move < vertex ? vertex : move,
             pageY: pageY,
             scrollType: scrollType,
-            scrollbarY: scrollbarY,
-            scrollbarShow: deltaY == move ? false : true
+            scrollbarY: scrollbarY
           })
         } else {
           if (move < height && move > 0) {
@@ -102,39 +108,28 @@ Component({
             scrollType = 2;//下拉完成
             scrollbarY = -scrollbarY;
           }
-          if (pageY - this.data.pageY < 0 && move > 0) {
-            vertex = (vertex - Math.abs(pageY - this.data.pageY));
-            pageY = this.data.pageY;
-          }
           this.setData({
             deltaY: move > vertex ? vertex : move,
             pageY: pageY,
             scrollType: scrollType,
-            scrollbarY: scrollbarY,
-            scrollbarShow: deltaY == move ? false : true
+            scrollbarY: scrollbarY
           })
         }
-      }
-    },
-    touchStart: function (e) {
-      if (e.changedTouches.length < 2) {
-        var height = this.data.pxScrollWrapper / this.data.pxScroll * this.data.pxScrollWrapper;
-        this.setData({
-          canOnePointMove: true,
-          pageStart: e.changedTouches[0].pageY,
-          pageY: e.changedTouches[0].pageY,
-          scrollbarHeight: parseInt(height)
-        })
       }
     },
     touchChend: function (e) {
       var self = this;
       var scrollType = self.data.scrollType;
       var height = self.properties.height;
-      var deltaY = self.properties.deltaY;
+      var deltaY = self.data.deltaY;
       var pxScrollWrapper = self.data.pxScrollWrapper;
       var tableHeight = self.data.pxScroll - pxScrollWrapper;
+      var time = new Date().getTime() - self.data.startTime;
       var scrollbarY;
+      if (time < 500) {
+        deltaY = deltaY + (e.changedTouches[0].pageY - self.data.pageStart) / self.properties.deceleration * (1 / time);
+        deltaY = parseInt(deltaY)
+      }
       if (deltaY > 0){
         if (scrollType == 2){
           tableHeight = height;
@@ -146,7 +141,8 @@ Component({
           scrollbarY = 0;
         }
         self.setData({
-          pageStart: 0,
+          pageY: 0,
+          startTime: 0,
           deltaY: tableHeight,
           scrollType: scrollType,
           scrollbarY: scrollbarY,
@@ -162,7 +158,8 @@ Component({
           scrollbarY = pxScrollWrapper - this.data.scrollbarHeight;
         }
         self.setData({
-          pageStart: 0,
+          pageY: 0,
+          startTime: 0,
           deltaY: -tableHeight,
           scrollType: scrollType,
           scrollbarY: scrollbarY,
@@ -170,7 +167,9 @@ Component({
         })
       }else{
         self.setData({
-          pageStart: 0,
+          deltaY: deltaY,
+          pageY: 0,
+          startTime: 0,
           canOnePointMove: false
         })
       }
