@@ -127,7 +127,7 @@ Component({
       var time = new Date().getTime() - self.data.startTime;
       var scrollbarY;
       if (time < 500) {
-        deltaY = deltaY + (e.changedTouches[0].pageY - self.data.pageStart) / self.properties.deceleration * (1 / time);
+        deltaY = deltaY + (e.changedTouches[0].pageY - self.data.pageStart) / self.properties.deceleration * (1 / time) * 100;
         deltaY = parseInt(deltaY)
       }
       if (deltaY > 0){
